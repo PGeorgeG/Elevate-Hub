@@ -44,7 +44,7 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     maxAge: 7 * 24 * 60 * 60 * 1000,
-    secure: false,
+    secure: process.env.NODE_ENV === 'production' || !!process.env.RAILWAY_ENVIRONMENT,
     sameSite: 'lax'
   }
 }));
@@ -52,6 +52,9 @@ app.use(session({
 // ── Auth middleware ───────────────────────────────────────────────────────────
 function requireAuth(req, res, next) {
   if (req.session.authenticated) return next();
+  if (req.path.startsWith('/api/')) {
+    return res.status(401).json({ error: 'Not authenticated' });
+  }
   res.redirect('/login');
 }
 
