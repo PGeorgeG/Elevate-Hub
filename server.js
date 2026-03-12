@@ -65,7 +65,7 @@ app.get('/login', (req, res) => {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elevate — Volunteer Hub</title>
+<title>ELIC Online — Volunteer Hub</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -88,8 +88,8 @@ app.get('/login', (req, res) => {
 </head>
 <body>
 <div class="box">
-  <h1>Elev<span>ate</span></h1>
-  <p>Volunteer Hub — ELIC Online</p>
+  <h1>ELIC <span>Online</span></h1>
+  <p>Volunteer Hub</p>
   ${req.query.error ? '<div class="error">Incorrect password — try again.</div>' : ''}
   <form method="POST" action="/login">
     <input type="password" name="password" placeholder="Password" autofocus />
