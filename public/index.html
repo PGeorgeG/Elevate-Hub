@@ -776,6 +776,9 @@
     📬 Communications
     <span class="nav-badge" id="comms-count" style="background:#fdf0f8;color:#8b2d7a;">0</span>
   </div>
+  <div class="nav-tab" onclick="switchView('settings', this)">
+    ⚙️ Settings
+  </div>
 </nav>
 
 <div class="main">
@@ -875,6 +878,23 @@
         </thead>
         <tbody id="comms-tbody"></tbody>
       </table>
+    </div>
+  <!-- SETTINGS VIEW -->
+  <div class="view" id="view-settings">
+    <div class="section-header">
+      <h2>Settings</h2>
+    </div>
+    <div class="table-card" style="max-width:560px;padding:32px;">
+      <h3 style="font-family:'DM Serif Display',serif;font-size:1.1rem;margin-bottom:8px;">Export Data</h3>
+      <p style="color:var(--slate-light);font-size:13px;margin-bottom:20px;">Download all volunteer records as a spreadsheet you can open in Excel or Google Sheets.</p>
+      <button onclick="exportCSV()" style="background:var(--teal-mid);color:white;border:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">
+        ⬇️ Download All Volunteers (.csv)
+      </button>
+      <div style="margin-top:32px;padding-top:24px;border-top:1px solid var(--border);">
+        <h3 style="font-family:'DM Serif Display',serif;font-size:1.1rem;margin-bottom:8px;">Account</h3>
+        <p style="color:var(--slate-light);font-size:13px;margin-bottom:16px;">You are currently signed in.</p>
+        <a href="/logout" style="color:var(--coral);font-size:13px;text-decoration:none;font-weight:500;">Sign out →</a>
+      </div>
     </div>
   </div>
 
@@ -1613,6 +1633,7 @@ function switchView(view, el) {
   if (view === 'registry') renderRegistry();
   if (view === 'pipeline') renderPipeline();
   if (view === 'comms') renderComms();
+  if (view === 'settings') {} // static view, nothing to render
 }
 
 // ============================================================
@@ -2062,6 +2083,36 @@ function copySubject(subject, btnId) {
 // ============================================================
 // INIT
 // ============================================================
+
+// ── CSV EXPORT ────────────────────────────────────────────────────────────────
+
+function exportCSV() {
+  const cols = ['ID','First','Last','Email','Role','Stage','Owner','Timezone','Church/Referral','Qualifications','Notes','Date Added'];
+  const rows = volunteers.map(v => [
+    v.id,
+    v.first || '',
+    v.last || '',
+    v.email || '',
+    v.role || '',
+    v.stage || '',
+    v.owner || '',
+    v.timezone || '',
+    v.church || '',
+    v.quals || '',
+    v.notes || '',
+    v.date || ''
+  ].map(val => `"${String(val).replace(/"/g, '""')}"`).join(','));
+
+  const csv = [cols.map(c => `"${c}"`).join(','), ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `elic-volunteers-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Downloaded ' + volunteers.length + ' volunteers');
+}
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 
