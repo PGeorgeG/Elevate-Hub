@@ -19,7 +19,15 @@ const pool = new Pool({
   ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
 });
 
-// Create table if it doesn't exist yet — runs once on startup
+// Default dropdown options
+const DEFAULTS = {
+  roles: ['Ta/Teacher', 'WFS Tutor', 'Medical Mentor', 'E-Pal', 'Advocate', 'Prayer Partner'],
+  stages: ['Contact in Review', '#1. Intake Form Sent', '#2 Intake Form Received', '#3. Program Form Completed', '#4 Application Pieces', '#5 Onboarding', '#5 Advocating', '#1 Teaching', '#2 Inactive', '#3 Non-Return'],
+  owners: ['Lauren', 'Micaela'],
+  timezones: ['GMT-8 (Pacific)', 'GMT-7 (Mountain)', 'GMT-6 (Central)', 'GMT-5 (Eastern)', 'GMT-4 (Atlantic)', 'GMT+0 (UTC)', 'GMT+1 (W. Europe)', 'GMT+2 (E. Europe)', 'GMT+5:30 (India)', 'GMT+8 (China/HK)', 'GMT+9 (Japan)', 'GMT+10 (Australia E)', 'GMT+12 (NZ)']
+};
+
+// Create tables if they don't exist yet — runs once on startup
 async function initDB() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS volunteers (
@@ -29,6 +37,19 @@ async function initDB() {
       updated_at TIMESTAMPTZ DEFAULT NOW()
     )
   `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS settings (
+      key   TEXT PRIMARY KEY,
+      value JSONB NOT NULL
+    )
+  `);
+  // Seed defaults if not already set
+  for (const [key, value] of Object.entries(DEFAULTS)) {
+    await pool.query(
+      `INSERT INTO settings (key, value) VALUES ($1, $2) ON CONFLICT (key) DO NOTHING`,
+      [key, JSON.stringify(value)]
+    );
+  }
   console.log('Database ready.');
 }
 initDB().catch(err => console.error('DB init error:', err.message));
@@ -172,6 +193,38 @@ app.delete('/api/volunteers/:id', requireAuth, async (req, res) => {
     res.json({ ok: true });
   } catch (err) {
     console.error('DELETE /api/volunteers/:id error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── Settings API ──────────────────────────────────────────────────────────────
+
+// GET all settings
+app.get('/api/settings', requireAuth, async (req, res) => {
+  try {
+    const result = await pool.query('SELECT key, value FROM settings');
+    const settings = {};
+    result.rows.forEach(row => { settings[row.key] = row.value; });
+    res.json(settings);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// PUT update a setting (replaces the full array for that key)
+app.put('/api/settings/:key', requireAuth, async (req, res) => {
+  const { key } = req.params;
+  if (!['roles', 'stages', 'owners', 'timezones'].includes(key)) {
+    return res.status(400).json({ error: 'Invalid setting key' });
+  }
+  try {
+    await pool.query(
+      `INSERT INTO settings (key, value) VALUES ($1, $2)
+       ON CONFLICT (key) DO UPDATE SET value = $2`,
+      [key, JSON.stringify(req.body.value)]
+    );
+    res.json({ ok: true });
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });

@@ -670,6 +670,44 @@
   .empty-state h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; color: var(--slate-mid); }
   .empty-state p { font-size: 13px; }
 
+  /* ACCORDION */
+  .accordion-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 16px 20px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    margin-bottom: 2px;
+    transition: background 0.15s;
+    user-select: none;
+  }
+  .accordion-header:hover { background: #f7f8fa; }
+  .accordion-arrow {
+    font-size: 12px;
+    color: #718096;
+    transition: transform 0.2s;
+    display: inline-block;
+  }
+  .accordion-arrow.collapsed { transform: rotate(-90deg); }
+  .accordion-body {
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.2s ease, padding-top 0.2s ease;
+    max-height: 9999px;
+    opacity: 1;
+    padding-top: 16px;
+  }
+  .accordion-body.collapsed {
+    max-height: 0 !important;
+    opacity: 0;
+    padding-top: 0;
+    pointer-events: none;
+  }
+
   /* TOAST */
   .toast {
     position: fixed;
@@ -776,8 +814,8 @@
     📬 Communications
     <span class="nav-badge" id="comms-count" style="background:#fdf0f8;color:#8b2d7a;">0</span>
   </div>
-  <div class="nav-tab" onclick="switchView('settings', this)">
-    ⚙️ Settings
+  <div class="nav-tab" onclick="switchView('setup', this)">
+    ⚙️ Setup
   </div>
 </nav>
 
@@ -794,30 +832,12 @@
       </div>
       <select class="filter-select" id="filter-role" onchange="renderRegistry()">
         <option value="">All Roles</option>
-        <option value="Ta/Teacher">Ta/Teacher</option>
-        <option value="WFS Tutor">WFS Tutor</option>
-        <option value="Medical Mentor">Medical Mentor</option>
-        <option value="E-Pal">E-Pal</option>
-        <option value="Advocate">Advocate</option>
-        <option value="Prayer Partner">Prayer Partner</option>
       </select>
       <select class="filter-select" id="filter-stage" onchange="renderRegistry()">
         <option value="">All Stages</option>
-        <option value="Contact in Review">Contact in Review</option>
-        <option value="#1. Intake Form Sent">#1. Intake Form Sent</option>
-        <option value="#2 Intake Form Received">#2 Intake Form Received</option>
-        <option value="#3. Program Form Completed">#3. Program Form Completed</option>
-        <option value="#4 Application Pieces">#4 Application Pieces</option>
-        <option value="#5 Onboarding">#5 Onboarding</option>
-        <option value="#5 Advocating">#5 Advocating</option>
-        <option value="#1 Teaching">#1 Teaching</option>
-        <option value="#2 Inactive">#2 Inactive</option>
-        <option value="#3 Non-Return">#3 Non-Return</option>
       </select>
       <select class="filter-select" id="filter-owner" onchange="renderRegistry()">
         <option value="">All Owners</option>
-        <option value="Lauren">Lauren</option>
-        <option value="Micaela">Micaela</option>
       </select>
     </div>
 
@@ -845,12 +865,6 @@
       <h2>Volunteer Pipeline</h2>
       <select class="filter-select" id="pipeline-filter-role" onchange="renderPipeline()">
         <option value="">All Roles</option>
-        <option value="Ta/Teacher">Ta/Teacher</option>
-        <option value="WFS Tutor">WFS Tutor</option>
-        <option value="Medical Mentor">Medical Mentor</option>
-        <option value="E-Pal">E-Pal</option>
-        <option value="Advocate">Advocate</option>
-        <option value="Prayer Partner">Prayer Partner</option>
       </select>
     </div>
 
@@ -861,43 +875,188 @@
 
   <!-- COMMS VIEW -->
   <div class="view" id="view-comms">
-    <div class="section-header">
-      <h2>Communications Tracker</h2>
-      <div style="font-size:13px;color:var(--slate-light);">Pending items across all volunteers</div>
-    </div>
-    <div class="table-card">
-      <table>
-        <thead>
-          <tr>
-            <th>Volunteer</th>
-            <th>Role</th>
-            <th>Stage</th>
-            <th>Next Action</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="comms-tbody"></tbody>
-      </table>
-    </div>
-  <!-- SETTINGS VIEW -->
-  <div class="view" id="view-settings">
-    <div class="section-header">
-      <h2>Settings</h2>
-    </div>
-    <div class="table-card" style="max-width:560px;padding:32px;">
-      <h3 style="font-family:'DM Serif Display',serif;font-size:1.1rem;margin-bottom:8px;">Export Data</h3>
-      <p style="color:var(--slate-light);font-size:13px;margin-bottom:20px;">Download all volunteer records as a spreadsheet you can open in Excel or Google Sheets.</p>
-      <button onclick="exportCSV()" style="background:var(--teal-mid);color:white;border:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">
-        ⬇️ Download All Volunteers (.csv)
-      </button>
-      <div style="margin-top:32px;padding-top:24px;border-top:1px solid var(--border);">
-        <h3 style="font-family:'DM Serif Display',serif;font-size:1.1rem;margin-bottom:8px;">Account</h3>
-        <p style="color:var(--slate-light);font-size:13px;margin-bottom:16px;">You are currently signed in.</p>
-        <a href="/logout" style="color:var(--coral);font-size:13px;text-decoration:none;font-weight:500;">Sign out →</a>
+    <div class="section-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <div>
+        <h2>Communications</h2>
+        <div style="font-size:13px;color:var(--slate-light);margin-top:2px;">Pending items grouped by volunteer</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <button onclick="toggleAllCommsCards()" id="collapse-all-btn"
+          style="padding:7px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;
+                 font-family:'DM Sans',sans-serif;background:white;cursor:pointer;color:#4a5568;
+                 display:flex;align-items:center;gap:5px;">
+          <span id="collapse-all-arrow" style="font-size:11px;transition:transform 0.2s;display:inline-block;">▼</span>
+          <span id="collapse-all-label">Collapse all</span>
+        </button>
+        <select id="comms-sort" onchange="renderComms()"
+          style="padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:'DM Sans',sans-serif;background:white;outline:none;">
+          <option value="pending">↓ Most pending</option>
+          <option value="owner">Owner</option>
+          <option value="stage">Stage</option>
+          <option value="role">Role</option>
+          <option value="name">Name A–Z</option>
+          <option value="date">Date added</option>
+        </select>
+        <select id="comms-filter-owner" onchange="renderComms()"
+          style="padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:'DM Sans',sans-serif;background:white;outline:none;">
+          <option value="">All owners</option>
+          <option value="Lauren">Lauren</option>
+          <option value="Micaela">Micaela</option>
+        </select>
+        <select id="comms-filter-track" onchange="renderComms()"
+          style="padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:'DM Sans',sans-serif;background:white;outline:none;">
+          <option value="">All types</option>
+          <option value="email">Emails only</option>
+          <option value="async">Async training only</option>
+        </select>
       </div>
     </div>
+    <div id="comms-cards"></div>
   </div>
 
+  <!-- SETUP VIEW -->
+  <div class="view" id="view-setup">
+
+    <!-- SECTION: Email Templates -->
+    <div class="accordion-header" onclick="toggleAccordion('templates')" id="acc-hdr-templates">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span class="accordion-arrow" id="acc-arrow-templates">▼</span>
+        <h2 style="margin:0;">Email Templates</h2>
+      </div>
+      <div style="font-size:13px;color:#718096;">Click any template to view or edit.</div>
+    </div>
+    <div id="acc-body-templates" class="accordion-body">
+      <div id="template-role-tabs" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;"></div>
+      <div id="template-list" style="margin-bottom:40px;"></div>
+    </div>
+
+    <!-- SECTION: Settings -->
+    <div class="accordion-header" onclick="toggleAccordion('settings')" id="acc-hdr-settings" style="margin-top:8px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span class="accordion-arrow" id="acc-arrow-settings">▼</span>
+        <h2 style="margin:0;">Settings</h2>
+      </div>
+    </div>
+    <div id="acc-body-settings" class="accordion-body">
+
+    <div style="display:flex;flex-wrap:wrap;gap:20px;margin-bottom:24px;margin-top:4px;">
+
+      <div class="table-card" style="flex:1;min-width:260px;padding:24px;">
+        <div style="font-family:'DM Serif Display',serif;font-size:1rem;font-weight:400;margin-bottom:4px;">Roles</div>
+        <div style="color:#718096;font-size:12px;margin-bottom:14px;">Volunteer role types</div>
+        <div id="settings-roles"></div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <input id="new-role" type="text" placeholder="New role..."
+            style="flex:1;padding:8px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;">
+          <button onclick="addSettingItem('roles','new-role')"
+            style="background:#2d9d8f;color:white;border:none;border-radius:6px;padding:8px 14px;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;">Add</button>
+        </div>
+      </div>
+
+      <div class="table-card" style="flex:1;min-width:260px;padding:24px;">
+        <div style="font-family:'DM Serif Display',serif;font-size:1rem;font-weight:400;margin-bottom:4px;">Pipeline Stages</div>
+        <div style="color:#718096;font-size:12px;margin-bottom:14px;">Onboarding and active stages</div>
+        <div id="settings-stages"></div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <input id="new-stage" type="text" placeholder="New stage..."
+            style="flex:1;padding:8px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;">
+          <button onclick="addSettingItem('stages','new-stage')"
+            style="background:#2d9d8f;color:white;border:none;border-radius:6px;padding:8px 14px;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;">Add</button>
+        </div>
+      </div>
+
+      <div class="table-card" style="flex:1;min-width:260px;padding:24px;">
+        <div style="font-family:'DM Serif Display',serif;font-size:1rem;font-weight:400;margin-bottom:4px;">Owners</div>
+        <div style="color:#718096;font-size:12px;margin-bottom:14px;">Staff who manage volunteers</div>
+        <div id="settings-owners"></div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <input id="new-owner" type="text" placeholder="New owner..."
+            style="flex:1;padding:8px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;">
+          <button onclick="addSettingItem('owners','new-owner')"
+            style="background:#2d9d8f;color:white;border:none;border-radius:6px;padding:8px 14px;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;">Add</button>
+        </div>
+      </div>
+
+      <div class="table-card" style="flex:1;min-width:260px;padding:24px;">
+        <div style="font-family:'DM Serif Display',serif;font-size:1rem;font-weight:400;margin-bottom:4px;">Timezones</div>
+        <div style="color:#718096;font-size:12px;margin-bottom:14px;">Available timezone options</div>
+        <div id="settings-timezones"></div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <input id="new-timezone" type="text" placeholder="e.g. GMT+3 (East Africa)"
+            style="flex:1;padding:8px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;">
+          <button onclick="addSettingItem('timezones','new-timezone')"
+            style="background:#2d9d8f;color:white;border:none;border-radius:6px;padding:8px 14px;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;">Add</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="table-card" style="max-width:520px;padding:28px;">
+      <div style="font-family:'DM Serif Display',serif;font-size:1.1rem;margin-bottom:8px;">Export Data</div>
+      <div style="color:#718096;font-size:13px;margin-bottom:18px;">Download all volunteer records as a spreadsheet you can open in Excel or Google Sheets.</div>
+      <button onclick="exportCSV()"
+        style="background:#2d9d8f;color:white;border:none;border-radius:8px;padding:11px 22px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">
+        Download All Volunteers (.csv)
+      </button>
+      <div style="margin-top:28px;padding-top:22px;border-top:1px solid #e2e8f0;">
+        <div style="font-family:'DM Serif Display',serif;font-size:1.1rem;margin-bottom:8px;">Account</div>
+        <div style="color:#718096;font-size:13px;margin-bottom:14px;">You are currently signed in.</div>
+        <a href="/logout" style="color:#d95f4b;font-size:13px;text-decoration:none;font-weight:500;">Sign out</a>
+      </div>
+    </div>
+
+    </div> <!-- /acc-body-settings -->
+
+  </div>
+
+</div>
+
+<!-- TEMPLATE EDITOR PANEL (slide-in overlay) -->
+<div id="template-editor-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;" onclick="handleTemplateOverlayClick(event)">
+  <div id="template-editor-panel" style="position:absolute;right:0;top:0;bottom:0;width:min(680px,100vw);background:white;display:flex;flex-direction:column;box-shadow:-4px 0 24px rgba(0,0,0,0.15);">
+    <div style="padding:20px 24px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;background:#f7f8fa;">
+      <div>
+        <div id="tpl-editor-label" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:#718096;margin-bottom:3px;"></div>
+        <div id="tpl-editor-title" style="font-family:'DM Serif Display',serif;font-size:1.2rem;"></div>
+      </div>
+      <button onclick="closeTemplateEditor()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#718096;line-height:1;">✕</button>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:24px;">
+      <div style="margin-bottom:16px;">
+        <label style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#718096;display:block;margin-bottom:6px;">Subject Line</label>
+        <input id="tpl-subject-input" type="text"
+          style="width:100%;padding:10px 12px;border:1px solid #e2e8f0;border-radius:6px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;font-weight:500;">
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#718096;display:block;margin-bottom:6px;">
+          Email Body
+          <span id="tpl-needs-content-badge" style="display:none;background:#fdf3e3;color:#c8892a;border:1px solid #f0c977;border-radius:4px;padding:2px 7px;font-size:10px;margin-left:8px;font-weight:600;">NEEDS CONTENT</span>
+        </label>
+        <textarea id="tpl-body-input"
+          style="width:100%;min-height:380px;padding:12px;border:1px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:'DM Sans',sans-serif;line-height:1.7;resize:vertical;outline:none;"></textarea>
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#718096;display:block;margin-bottom:6px;">Notes for Staff</label>
+        <input id="tpl-notes-input" type="text"
+          style="width:100%;padding:10px 12px;border:1px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;color:#718096;">
+      </div>
+      <div id="tpl-placeholders-display" style="margin-bottom:16px;display:none;">
+        <label style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#c8892a;display:block;margin-bottom:6px;">Placeholders in this template</label>
+        <div id="tpl-placeholder-chips" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+        <div style="font-size:11px;color:#718096;margin-top:6px;">These will appear as fill-in fields when composing.</div>
+      </div>
+    </div>
+    <div style="padding:16px 24px;border-top:1px solid #e2e8f0;display:flex;gap:10px;justify-content:flex-end;background:#f7f8fa;">
+      <button onclick="saveTemplateEdits()"
+        style="background:#2d9d8f;color:white;border:none;border-radius:8px;padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">
+        Save Changes
+      </button>
+      <button onclick="closeTemplateEditor()"
+        style="background:none;border:1px solid #e2e8f0;border-radius:8px;padding:10px 20px;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;color:#718096;">
+        Cancel
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- ADD/EDIT MODAL -->
@@ -925,58 +1084,24 @@
           <label>Role</label>
           <select id="f-role" onchange="updateCommsChecklist()">
             <option value="">Select role...</option>
-            <option>Ta/Teacher</option>
-            <option>WFS Tutor</option>
-            <option>Medical Mentor</option>
-            <option>E-Pal</option>
-            <option>Advocate</option>
-            <option>Prayer Partner</option>
           </select>
         </div>
         <div class="form-group">
           <label>Pipeline Stage</label>
           <select id="f-stage">
             <option value="">Select stage...</option>
-            <option>Contact in Review</option>
-            <option>#1. Intake Form Sent</option>
-            <option>#2 Intake Form Received</option>
-            <option>#3. Program Form Completed</option>
-            <option>#4 Application Pieces</option>
-            <option>#5 Onboarding</option>
-            <option>#5 Advocating</option>
-            <option>#1 Teaching</option>
-            <option>#2 Inactive</option>
-            <option>#3 Non-Return</option>
           </select>
         </div>
         <div class="form-group">
           <label>Owner</label>
           <select id="f-owner">
             <option value="">Assign owner...</option>
-            <option>Lauren</option>
-            <option>Micaela</option>
           </select>
         </div>
         <div class="form-group">
           <label>Timezone</label>
           <select id="f-timezone">
             <option value="">Select timezone...</option>
-            <option>GMT-8 (Pacific)</option>
-            <option>GMT-7 (Mountain)</option>
-            <option>GMT-6 (Central)</option>
-            <option>GMT-5 (Eastern)</option>
-            <option>GMT-4 (Atlantic)</option>
-            <option>GMT+0 (London/Accra)</option>
-            <option>GMT+1 (W. Europe)</option>
-            <option>GMT+2 (E. Europe)</option>
-            <option>GMT+3 (Middle East)</option>
-            <option>GMT+5 (Pakistan)</option>
-            <option>GMT+5:30 (India)</option>
-            <option>GMT+6 (Bangladesh)</option>
-            <option>GMT+7 (SE Asia)</option>
-            <option>GMT+8 (China/Singapore)</option>
-            <option>GMT+9 (Japan/Korea)</option>
-            <option>GMT+10 (E. Australia)</option>
           </select>
         </div>
         <div class="form-group">
@@ -1055,7 +1180,15 @@ const COMMS_WORKFLOW = {
       preview: 'Welcome email introducing volunteer opportunities: prayer partner, teacher/TA, e-pal, or medical mentor. Directs them to the opportunities flyer (password: TEACH2025) and invites questions.',
       placeholders: [],
       notes: 'Auto-send once contact is verified. Include link to Everything Form.',
-      owner: 'Micaela'
+      owner: 'Micaela',
+      body: `Hello,
+
+We are delighted to hear that you may be interested in connecting with Afghan women online! We have opportunities to be a prayer partner, a teacher or teacher's assistant for women studying English, a pen pal with a small group of Afghan women, or a medical mentor to Afghan women interested in pursuing a degree in a medical field. How cool to be able to bring HIS presence to people across the world from our own homes!
+
+This flyer (password: TEACH2025) has information about our different programs. Click on a program to learn about what it entails and what you need to do to join! If you have further questions after reading about our programs, please contact us at online@elic.org.
+
+
+Many blessings,`
     },
     {
       stage: '#2 Intake Form Received',
@@ -1064,7 +1197,16 @@ const COMMS_WORKFLOW = {
       preview: 'Overview flyer with intake form, contact info, and desired placement information.',
       placeholders: [],
       notes: 'Overview flyer w/ intake form, contact info & desired placement.',
-      owner: 'Lauren'
+      owner: 'Lauren',
+      body: `Hello,
+
+We are delighted to hear that you may be interested in connecting with Afghan women online! We have opportunities to be a prayer partner, a teacher or teacher's assistant for women studying English, a pen pal with a small group of Afghan women, or a medical mentor to Afghan women interested in pursuing a degree in a medical field.
+
+This flyer (password: TEACH2025) has information about our different programs: https://online.elic.org/opportunities
+
+Click on a program to learn about what it entails and what you need to do to join! If you have further questions after reading about our programs, please contact us at online@elic.org.
+
+Many blessings,`
     },
     {
       stage: '#3. Program Form Completed',
@@ -1073,7 +1215,33 @@ const COMMS_WORKFLOW = {
       preview: 'Explains the interviewing (pre-acceptance) and preparing to teach (post-acceptance) process. Lists 6 pre-acceptance steps: complete form, agree to Statement of Faith, observe a class, send 2 reference forms, sign up for 30-min interview, complete background check (Checkr). Post-acceptance: 3 live training sessions + async tech training.',
       placeholders: [],
       notes: 'Application received confirmation, interview & onboarding process overview.',
-      owner: 'Micaela'
+      owner: 'Micaela',
+      body: `Hello,
+
+We're delighted that you're exploring this opportunity with us! Let's talk about the process of interviewing and onboarding.
+
+Your "roadmap to impact" was designed with YOU in mind. We want you to be as informed and prepared as possible before volunteering with the amazing women in our program. Keep reading to see what the interview and onboarding process looks like.
+
+Interviewing (Pre-acceptance)
+5+ weeks before the program begins
+• Complete the form above.
+• Agree to ELIC's Statement of Faith
+• Observe a class.
+• Send 2 reference forms to trusted individuals.
+• Sign up for a 30-minute interview.
+• Complete a very quick background check on your phone or computer.
+
+Preparing to Teach (Post-acceptance)
+3-4 weeks before the program begins
+• Attend 3 live training sessions (Calendar below!)
+• Complete 3 asynchronous tech training sessions (WhatsApp, Google Drive, & Zoom) as well as "sandbox times", if needed.
+1 week before the program begins
+• Meet your coteacher and teaching team.
+• Start teaching your amazing students!
+
+❓Send questions to online@elic.org.
+
+Many blessings,`
     },
     {
       stage: '#4 Application Pieces',
@@ -1082,7 +1250,29 @@ const COMMS_WORKFLOW = {
       preview: 'Checklist of items due before term cutoff: (1) observe a class, (2) send reference form to 2 references, (3) sign up for 30-min interview, (4) complete background check via Checkr within 7 days of receiving it.',
       placeholders: ['{cutoff date}', '{cutoff time, EST}'],
       notes: 'Action items: statement of faith, observe class, references, interview, background check.',
-      owner: 'Lauren'
+      owner: 'Lauren',
+      body: `Hello,
+
+We are incredibly excited that you are considering volunteering to teach our INCREDIBLE Afghan students!
+
+The cutoff to say "yes" to our winter term is {cutoff date} @{cutoff time, EST}.
+
+Below are the things that will have to be finished by {cutoff date}. You may have already completed or signed up for some of these things, but we thought having it all laid out for you would help you know where you are and what you need to do.
+
+1. Sign up to observe a class.
+2. Send this reference form to two references.
+3. Sign up for a 30-minute interview. (Interview and references can be sent/signed up for at the same time!)
+
+BACKGROUND CHECKS
+Unless you have volunteered/been OBP with us in the last 18 months, you will receive an email from Checkr - after you've completed the above steps - in order to complete a background check. Our organization does this for all volunteers. It takes less than 5 minutes to complete, and can be done from your computer or phone. Please complete it within 7 days of receiving it. We have to pay for each one that is sent out. :)
+
+If you're looking to volunteer in the winter or later, you'll still need to complete this process, but your deadline for doing all of this is further down the road.
+
+If you have any questions or concerns, please reach out to both Lauren and Micaela.
+
+Many blessings,
+
+Lauren & Micaela`
     },
     {
       stage: '#4 Application Pieces',
@@ -1100,7 +1290,56 @@ const COMMS_WORKFLOW = {
       preview: 'Acceptance email! Outlines commitment: 4.5 hrs training before program, 3.5 hrs/week during (75 min class twice weekly Mon/Wed or Tue/Thu, 1 hr feedback/prep/comms). Classes run 8 weeks + 1 certificate week. Asks them to confirm class times via form within 24 hrs. Introduces 3 live training sessions (all Thursdays) and WhatsApp async training.',
       placeholders: ['{Name}', '{form link for class time confirmation}'],
       notes: 'Welcome: upcoming meeting overviews with dates. Commitment details included.',
-      owner: 'Lauren'
+      owner: 'Lauren',
+      body: `Dear {Name},
+
+We are pleased to inform you that you have been accepted as a Resource Teacher for our Afghanistan Program!
+
+Commitment
+I'd like you to review our expectations of you during this program:
+
+• 4.5 hours of training the month before the program begins.
+  - 1.5 hours of asynchronous training
+  - 3 hours of live training
+• 3.5 hours per week during the program
+  - 75 minutes of class twice weekly (Monday/Wednesday OR Tuesday/Thursday)
+  - 1 hour of giving feedback, reading the lesson plan, and communicating with the students and your co-teacher each week.
+• Classes last for 8 weeks + 1 additional week for you to send out certificates of completion.
+
+Can you commit to the expectations above?
+
+Class Times
+If you would like to accept this role, please complete this form within 24 hours confirming the times you're available as well as your preference for the students' English level:
+{form link for class time confirmation}
+
+LIVE TRAININGS
+You'll notice that we always meet at the same time on Thursdays. Please note that the Zoom links for each meeting are different for security purposes. We'd love for you to join us, but if you are unable to, we'll email you a recording of the meeting to watch afterward. You will receive a Google Calendar invitation for all of these training sessions as well. Keep reading to learn about your upcoming training sessions! (Returning teachers do not need to attend Sessions 1 or 2.)
+
+Session 1: Online Teaching 101
+Thursday, November 13th — New Resource Teachers
+In this session you will learn how to elevate your online classroom to be highly relational and have maximum pedagogical efficacy.
+
+Session 2: Culture, Security + CR
+Thursday, November 20th — New Resource Teachers
+In this session you'll learn more than what you can and can't say. You'll learn about some of the common behaviors you might encounter, what to do in sticky situations, and why we all wear a covering in class!
+
+Session 3: All-Staff Kickoff + Orientation
+Thursday, December 4th — All Resource Teachers
+Meet your team leader and learn about the processes we have in place to keep things running smoothly.
+
+WHATSAPP ASYNCHRONOUS TECH TRAINING
+After the training on Thursday, you'll get an email with a Slideshow that will walk you through everything you need to know about WhatsApp. If it is overwhelming, just try to go through 2-3 slides per day.
+
+WHO IS MY COTEACHER?
+You'll get team assignments within the next 10 days.
+
+What questions do you have? We would love to answer them for you!
+
+Many blessings,
+
+Lauren and Micaela
+
+If you do not want to accept this role, please reply to this email to inform us.`
     },
     {
       stage: '#5 Onboarding',
@@ -1109,7 +1348,23 @@ const COMMS_WORKFLOW = {
       preview: 'Reminder for Session 1: Online Teaching 101. Covers how to run an engaging, relational online classroom. If they can\'t attend live, they\'ll receive a recording and should watch within 24 hrs.',
       placeholders: ['{Thursday date}', '{Zoom link}'],
       notes: 'Session 1 invite. Send 1 week before + 24hr reminder.',
-      owner: 'Lauren'
+      owner: 'Lauren',
+      body: `Hello,
+
+We're excited for our first live training! Details are below:
+
+Session 1: Online Teaching 101
+{Thursday date}
+8-9am, Eastern
+Zoom link: {Zoom link}
+
+Just like in face-to-face classes, there are methods to teach engaging and informative lessons that inspire growth. In this session you will learn how to elevate your online classroom to be highly relational and have maximum pedagogical efficacy.
+
+If you are not able to make it, we'll miss you! You will all receive a recording of the session within a few hours of it ending. We'd like you to watch it within 24 hours of being sent so all of your questions can be answered before the second session.
+
+Many blessings,
+
+Lauren and Micaela`
     },
     {
       stage: '#5 Onboarding',
@@ -1118,7 +1373,26 @@ const COMMS_WORKFLOW = {
       preview: 'Post-session recap with link to recording and slides. Ask them to watch by Monday and email questions. Slides/video are for their eyes only.',
       placeholders: ['{recording link}', '{slides link}', '{Zoom summary}'],
       notes: 'Session 1 recap — send after meeting. Include recording and slides.',
-      owner: 'Lauren'
+      owner: 'Lauren',
+      body: `Hey everyone,
+
+It was wonderful seeing most of you this morning! We missed those of you who could not attend, but you can watch the recording here: {recording link}
+
+Please watch it this weekend and email both Lauren and Micaela any questions you have by Monday. Here are the slides from today's meeting for you to review, should you want to: {slides link}
+
+These slides and this video are for your eyes only. :)
+
+Here is the meeting recap, courtesy of Zoom:
+
+-----------------
+{Zoom summary}
+-----------------
+
+We are thankful for you and honored that you are joining us!
+
+Many blessings,
+
+Lauren & Micaela`
     },
     {
       stage: '#5 Onboarding',
@@ -1127,7 +1401,17 @@ const COMMS_WORKFLOW = {
       preview: 'Sends the term\'s team book. Asks: (1) Do they need a copy? (2) Hard copy or ebook? Reply by Monday @ 2pm Eastern.',
       placeholders: ['{Book Title}', '{reply deadline}'],
       notes: 'Book or e-book for the term. Confirm format preference.',
-      owner: 'Lauren'
+      owner: 'Lauren',
+      body: `Hi!
+
+The book your team is reading this term is {Book Title}.
+
+1. Do you need a copy of the book?
+2. If you do, would you prefer a hard copy or an ebook?
+
+Please reply by {reply deadline}.
+
+Thank you!`
     },
     {
       stage: '#5 Onboarding',
@@ -1136,7 +1420,20 @@ const COMMS_WORKFLOW = {
       preview: 'Explains two key terms: CR (Cultural Relations) = the eternal reason they serve, and CGs (Communication Guidelines) = being careful with language in sensitive contexts (e.g. "He" instead of "God", "lifting/thinking" instead of "praying"). No set word list — just awareness of Christianese.',
       placeholders: [],
       notes: 'Send CR and CGs explanation before training. Important for security-sensitive contexts.',
-      owner: 'Micaela'
+      owner: 'Micaela',
+      body: `Hello amazing Resource teachers!
+
+Some of our Resource Teachers (RTs) are based in countries overseas, and therefore, we will be using some language/words on the call to keep them safe. Specifically you will hear two terms that we want to define for you ahead of time:
+
+CR (Cultural Relations): This is a phrase we use to describe the eternal reason why we do things for His glory, and the many variety of ways that we are able to share that good news — from encouraging messages to lifting our students and everything in between.
+
+CGs (Communication Guidelines): This is a phrase we use to describe being careful with our words because of the contexts with which we are working, such as changing words like "God" to "He", and "praying" to "lifting/thinking", etc. There's not really a set list of word conversions, but just the principle of being aware of our Christianese speech, and using less descriptive words/phrases.
+
+Please let Lauren and Micaela know via email if you have any direct questions about these terms.
+
+We're excited to meet with you soon!
+
+Micaela & Lauren`
     },
     {
       stage: '#5 Onboarding',
@@ -1145,7 +1442,23 @@ const COMMS_WORKFLOW = {
       preview: 'Reminder for Session 2: Culture, Security & CR. Covers cultural awareness, what to say/not say, common behaviours, sticky situations, and why teachers wear a covering in class.',
       placeholders: ['{Thursday date}', '{Zoom link}'],
       notes: 'Session 2 invite. Send 1 week before + 24hr reminder.',
-      owner: 'Lauren'
+      owner: 'Lauren',
+      body: `Hello,
+
+We're happy you'll be back for our second live training!
+
+🧕🏽 Session 2: Culture, Security, & CR 🧕🏽
+{Thursday date}
+8-9am, Eastern
+Zoom link: {Zoom link}
+
+Cultural awareness and sensitivity are necessary for relational bonds to grow in our classroom and for affective filters to be as low as possible for our students. In this session you'll learn more than what you can and can't say. You'll learn about some of the common behaviors you might encounter, what to do in sticky situations, and why we all wear a covering in class!
+
+If you are not able to make it, we'll miss you! You will all receive a recording of the session within a few hours of it ending. We'd like you to watch it within 24 hours of being sent so all of your questions can be answered before the third session.
+
+Many blessings,
+
+Lauren and Micaela`
     },
     {
       stage: '#5 Onboarding',
@@ -1154,7 +1467,26 @@ const COMMS_WORKFLOW = {
       preview: 'Post-session recap with recording link and slides. Ask them to watch by Monday and email questions.',
       placeholders: ['{recording link}', '{slides link}', '{Zoom summary}'],
       notes: 'Session 2 recap — send after meeting.',
-      owner: 'Lauren'
+      owner: 'Lauren',
+      body: `Hey RTs (Resource Teachers),
+
+What a great meeting! I loved all of your thoughtful questions. We missed those of you who could not attend, but you can watch the recording here: {recording link}
+
+Please watch it this weekend and email both Lauren and Micaela any questions you have by Monday. Here are the slides from today's meeting for you to review, should you want to: {slides link}
+
+These slides and this video are for your eyes only. :)
+
+Here is the meeting recap, courtesy of Zoom:
+
+--------------------------
+{Zoom summary}
+--------------------------
+
+We are excited for what He has planned! Please reach out to Lauren and Micaela with any questions you have. We're here for you!
+
+Many blessings,
+
+Lauren & Micaela`
     },
     {
       stage: '#5 Onboarding',
@@ -1163,7 +1495,23 @@ const COMMS_WORKFLOW = {
       preview: 'Invite to Session 3: All-Staff Kickoff & Celebration. Meet team leaders, learn processes, team building. Will be added to colour-coded breakout rooms (Red, Yellow, Blue, Pink). Asks them to prepare a 1-min self-intro and think about icebreaker questions.',
       placeholders: ['{Thursday date}', '{Zoom link}'],
       notes: 'Session 3 (All-Elevate Kickoff) invite. Send 1 week + 24hr reminder.',
-      owner: 'Lauren'
+      owner: 'Lauren',
+      body: `Hello,
+
+We're happy you'll be back for our third live training!
+
+Session 3: All-Staff Kickoff & Celebration
+{Thursday date}
+8-9am, Eastern
+Zoom link: {Zoom link}
+
+Meet your team leader and learn more about the processes we have in place to keep things running smoothly. This will be a fun time of team building as well as learning the systems we use for our classes.
+
+If you are not able to make it, we'll miss you! You will all receive a recording of the session within a few hours of it ending. We'd like you to watch it within 24 hours of being sent so all of your questions can be answered before classes begin.
+
+Many blessings,
+
+Lauren and Micaela`
     },
     {
       stage: '#5 Onboarding',
@@ -1172,7 +1520,20 @@ const COMMS_WORKFLOW = {
       preview: 'Post-kickoff recap. Links to recordings (Main Room + colour breakout rooms), slides, and Elevate Drive.',
       placeholders: ['{recording links}', '{slides link}'],
       notes: 'Session 3 recap — send after kickoff.',
-      owner: 'Lauren'
+      owner: 'Lauren',
+      body: `Hey Team!
+
+It was wonderful to be with most of you this morning. For those of you who couldn't make it, we missed you! You can find links to the recordings below (all on the ELIC Online Drive).
+
+{recording links}
+
+Here are the slides if you'd like to review them: {slides link}
+
+If you have any questions, please do reach out. Your Team Leaders (TLs) and Lauren and Micaela are here for you!!
+
+Many blessings,
+
+The ELIC Online Lead Team`
     },
     {
       stage: '#5 Onboarding',
@@ -1181,7 +1542,109 @@ const COMMS_WORKFLOW = {
       preview: 'Final pre-class reminders: 3.5 hrs/week max time commitment; check Important Links doc; verify access to attendance sheets, lesson materials, scope & sequence, syllabus; update Zoom; introduce yourself on WhatsApp class chat (hobbies/food only — no hometown/school/location details); create Zoom link and send 60-30 min before class; don\'t optimize video clips (bandwidth); direct curriculum questions to colour group.',
       placeholders: ['{Important Links doc link}', '{Who Does What doc link}'],
       notes: 'Before class begins: Zoom update, WhatsApp groups, links check, class logistics.',
-      owner: 'Lauren'
+      owner: 'Lauren',
+      body: `Hey Teachers,
+
+Classes start next week! WHOOO HOOOO!!! Below you'll find helpful information & reminders.
+
+Hours
+You should spend no more than 3.5 hours per week teaching, prepping, and communicating with your students.
+
+Important Links Doc
+This doc will be your best friend. Take a few minutes today to click on the links you will need for class: {Important Links doc link}
+
+Check your Links
+Please take a moment to ensure you can access all you will need for class next week:
+- Attendance Sheets
+- Lesson Materials
+- Scope & Sequence
+- Syllabus
+
+Who Does What?
+This doc lists responsibilities for teachers, team leaders, and the admin team: {Who Does What doc link}
+
+Admin Availability
+Please remember that Lauren and Micaela do not work Friday-Sunday, although we will probably check things on Sunday night.
+
+WhatsApp (WA)
+You will be put in your class chats this Thursday or Friday! Be sure to introduce yourself to your students! A simple introduction (without details of your hometown, alma mater, or current place of residence) about hobbies or favorite foods is a great place to start.
+
+Zoom - Class Link
+Remember to make the link for your first week of class and send it in your WA class group! We recommend sending the link 60-30 minutes before class begins.
+
+Zoom - Videos
+When you show a video clip in class, DO NOT OPTIMIZE it. That takes up bandwidth and will likely kick some of your students out of the session.
+
+Updates
+Please update Zoom this weekend! If your computer is telling you it has software updates, please do this before the day of classes.
+
+Color Groups
+After you look over your lessons, direct your curriculum questions to your INTERNAL Color Group.
+
+What questions do you have?
+
+Many blessings,
+
+Lauren & Micaela`
+    },
+    {
+      stage: '#5 Onboarding',
+      email: 'Async Track: WhatsApp Training',
+      subject: '📱 WhatsApp Training Slideshow',
+      preview: 'Async tech training #1. Slideshow walks through everything they need to know about WhatsApp for class. Suggest 2-3 slides per day if overwhelming.',
+      placeholders: ['{WhatsApp slideshow link}'],
+      notes: 'Send after Welcome email (Response #4). Async — no live session needed.',
+      owner: 'Lauren',
+      track: 'async',
+      body: `Hi!
+
+Here is your WhatsApp training slideshow: {WhatsApp slideshow link}
+
+This will walk you through everything you need to know about using WhatsApp with your students. If it feels overwhelming, just try to go through 2-3 slides per day. If you have any techy people in your house, ask them to help! Lauren and Micaela are here to answer questions as well.
+
+Many blessings,
+
+Lauren & Micaela`
+    },
+    {
+      stage: '#5 Onboarding',
+      email: 'Async Track: Google Drive Training',
+      subject: '📁 Google Drive Training',
+      preview: 'Async tech training #2. Covers how to access and use the Google Drive folders for lesson materials, attendance sheets, and student resources.',
+      placeholders: ['{Google Drive training link}'],
+      notes: 'Send after WhatsApp training. Async — no live session needed.',
+      owner: 'Lauren',
+      track: 'async',
+      body: `Hi!
+
+Here is your Google Drive training: {Google Drive training link}
+
+This will show you how to find and use everything you need in the ELIC Online Drive — lesson materials, attendance sheets, scope & sequence, and student resources.
+
+Many blessings,
+
+Lauren & Micaela`
+    },
+    {
+      stage: '#5 Onboarding',
+      email: 'Async Track: Zoom Training',
+      subject: '💻 Zoom Training + Sandbox Time',
+      preview: 'Async tech training #3. Covers Zoom basics for running class: making links, breakout rooms, screen sharing, and the no-optimize video rule. Includes sandbox practice time if needed.',
+      placeholders: ['{Zoom training link}', '{sandbox signup link}'],
+      notes: 'Send after Google Drive training. Offer sandbox time for those who need practice.',
+      owner: 'Lauren',
+      track: 'async',
+      body: `Hi!
+
+Here is your Zoom training: {Zoom training link}
+
+This covers everything you need to know to run your class on Zoom — creating meeting links, using breakout rooms, sharing your screen, and a few important tips (like never optimizing video clips during class!).
+
+If you'd like some practice time before classes begin, you can sign up for a sandbox session here: {sandbox signup link}
+
+Many blessings,
+
+Lauren & Micaela`
     },
     {
       stage: '#1 Teaching',
@@ -1517,43 +1980,24 @@ const COMMS_WORKFLOW = {
 };
 
 // Sample seed data
-let volunteers = [];
+let volunteers = [
+  { id: 1, first: 'Sarah', last: 'Mitchell', email: 'smitchell@gmail.com', role: 'Ta/Teacher', stage: '#1 Teaching', owner: 'Lauren', timezone: 'GMT-5 (Eastern)', church: 'Crossroads Community', quals: 'CELTA, BA English', notes: 'Excellent character assessment. Very motivated.', date: '2024-01-15', comms: {} },
+  { id: 2, first: 'James', last: 'Okonkwo', email: 'jokonkwo@gmail.com', role: 'Ta/Teacher', stage: '#5 Onboarding', owner: 'Lauren', timezone: 'GMT-8 (Pacific)', church: 'Grace Fellowship', quals: 'MA TESOL', notes: 'Strong references. Ready to start next term.', date: '2024-02-20', comms: {} },
+  { id: 3, first: 'Priya', last: 'Sharma', email: 'psharma@email.com', role: 'WFS Tutor', stage: '#4 Application Pieces', owner: 'Lauren', timezone: 'GMT-7 (Mountain)', church: 'Westside Church', quals: 'ESL Certificate', notes: 'Referred by Pastor David.', date: '2024-03-05', comms: {} },
+  { id: 4, first: 'David', last: 'Chen', email: 'dchen@gmail.com', role: 'Medical Mentor', stage: '#1 Teaching', owner: 'Lauren', timezone: 'GMT-8 (Pacific)', church: 'City Light Church', quals: 'MD, volunteer experience in SE Asia', notes: '', date: '2023-11-10', comms: {} },
+  { id: 5, first: 'Maria', last: 'Rodriguez', email: 'mrodriguez@gmail.com', role: 'Advocate', stage: '#5 Advocating', owner: 'Micaela', timezone: 'GMT-6 (Central)', church: 'New Hope Baptist', quals: '', notes: 'Strong church connections, enthusiastic advocate.', date: '2024-01-28', comms: {} },
+  { id: 6, first: 'Thomas', last: 'Bergmann', email: 'tbergmann@gmail.com', role: 'Prayer Partner', stage: '#3. Program Form Completed', owner: 'Lauren', timezone: 'GMT+1 (W. Europe)', church: 'Stadtkirche Berlin', quals: '', notes: '', date: '2024-03-12', comms: {} },
+  { id: 7, first: 'Aisha', last: 'Patel', email: 'apatel@gmail.com', role: 'E-Pal', stage: '#5 Onboarding', owner: 'Lauren', timezone: 'GMT-5 (Eastern)', church: 'Faith Community', quals: 'Teaching assistant experience', notes: 'Very warm with students.', date: '2024-02-14', comms: {} },
+  { id: 8, first: 'Robert', last: 'Kim', email: 'rkim@gmail.com', role: 'Ta/Teacher', stage: 'Contact in Review', owner: 'Micaela', timezone: 'GMT-8 (Pacific)', church: 'Korean Central Church', quals: 'Pending review', notes: 'New enquiry - check references.', date: '2024-03-18', comms: {} },
+];
+let nextId = 9;
+let settings = {
+  roles: ['Ta/Teacher', 'WFS Tutor', 'Medical Mentor', 'E-Pal', 'Advocate', 'Prayer Partner'],
+  stages: ['Contact in Review', '#1. Intake Form Sent', '#2 Intake Form Received', '#3. Program Form Completed', '#4 Application Pieces', '#5 Onboarding', '#5 Advocating', '#1 Teaching', '#2 Inactive', '#3 Non-Return'],
+  owners: ['Lauren', 'Micaela'],
+  timezones: ['GMT-8 (Pacific)', 'GMT-7 (Mountain)', 'GMT-6 (Central)', 'GMT-5 (Eastern)', 'GMT-4 (Atlantic)', 'GMT+0 (UTC)', 'GMT+1 (W. Europe)', 'GMT+2 (E. Europe)', 'GMT+5:30 (India)', 'GMT+8 (China/HK)', 'GMT+9 (Japan)', 'GMT+10 (Australia E)', 'GMT+12 (NZ)']
+};
 let editingId = null;
-
-// ── API helpers ───────────────────────────────────────────────────────────────
-
-async function apiLoadVolunteers() {
-  const res = await fetch('/api/volunteers');
-  if (!res.ok) throw new Error('Failed to load volunteers');
-  volunteers = await res.json();
-  // Ensure comms is always an object
-  volunteers.forEach(v => { if (!v.comms) v.comms = {}; });
-}
-
-async function apiAddVolunteer(data) {
-  const res = await fetch('/api/volunteers', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  });
-  if (!res.ok) throw new Error('Failed to add volunteer');
-  return await res.json();
-}
-
-async function apiUpdateVolunteer(id, data) {
-  const res = await fetch(`/api/volunteers/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  });
-  if (!res.ok) throw new Error('Failed to update volunteer');
-  return await res.json();
-}
-
-async function apiDeleteVolunteer(id) {
-  const res = await fetch(`/api/volunteers/${id}`, { method: 'DELETE' });
-  if (!res.ok) throw new Error('Failed to delete volunteer');
-}
 
 // ============================================================
 // UTILITIES
@@ -1633,7 +2077,7 @@ function switchView(view, el) {
   if (view === 'registry') renderRegistry();
   if (view === 'pipeline') renderPipeline();
   if (view === 'comms') renderComms();
-  if (view === 'settings') {} // static view, nothing to render
+  if (view === 'setup') { renderTemplates(); renderSettingsLists(); }
 }
 
 // ============================================================
@@ -1760,73 +2204,177 @@ function renderPipeline() {
 // COMMS
 // ============================================================
 
+// Track collapsed state for volunteer cards
+const commsCollapsed = {};
+
+function toggleAllCommsCards() {
+  // Determine current state — if any are expanded, collapse all; if all collapsed, expand all
+  const allCollapsed = volunteers.every(v => commsCollapsed[v.id]);
+  volunteers.forEach(v => { commsCollapsed[v.id] = !allCollapsed; });
+  const arrow = document.getElementById('collapse-all-arrow');
+  const label = document.getElementById('collapse-all-label');
+  if (arrow) arrow.style.transform = allCollapsed ? 'rotate(0deg)' : 'rotate(-90deg)';
+  if (label) label.textContent = allCollapsed ? 'Collapse all' : 'Expand all';
+  renderComms();
+}
+
+function toggleCommsCard(volId) {
+  commsCollapsed[volId] = !commsCollapsed[volId];
+  const body = document.getElementById(`comms-body-${volId}`);
+  const arrow = document.getElementById(`comms-arrow-${volId}`);
+  if (body) body.classList.toggle('collapsed', commsCollapsed[volId]);
+  if (arrow) arrow.style.transform = commsCollapsed[volId] ? 'rotate(-90deg)' : 'rotate(0deg)';
+}
+
 function renderComms() {
   renderStats();
-  const tbody = document.getElementById('comms-tbody');
-  const rows = [];
+  const container = document.getElementById('comms-cards');
+  const filterOwner = document.getElementById('comms-filter-owner')?.value || '';
+  const filterTrack = document.getElementById('comms-filter-track')?.value || '';
+  const sortBy = document.getElementById('comms-sort')?.value || 'pending';
 
+  // Build list of volunteers with their pending comms
+  let cards = [];
   volunteers.forEach(v => {
-    const next = getNextComm(v);
-    if (next) {
-      rows.push({ v, comm: next });
+    let pending = getPendingComms(v);
+
+    if (filterOwner) pending = pending.filter(c => c.owner === filterOwner);
+    if (filterTrack === 'async') pending = pending.filter(c => c.track === 'async');
+    if (filterTrack === 'email') pending = pending.filter(c => !c.track);
+
+    // Only show comms at or before current stage
+    const stageOrder = (settings.stages || []);
+    const vStageIdx = stageOrder.indexOf(v.stage);
+    pending = pending.filter(c => {
+      const cStageIdx = stageOrder.indexOf(c.stage);
+      return cStageIdx <= vStageIdx || cStageIdx === -1;
+    });
+
+    if (pending.length > 0) cards.push({ v, pending });
+  });
+
+  // Sort
+  cards.sort((a, b) => {
+    switch (sortBy) {
+      case 'pending': return b.pending.length - a.pending.length;
+      case 'owner':   return (a.v.owner||'').localeCompare(b.v.owner||'');
+      case 'stage':   return (settings.stages||[]).indexOf(a.v.stage) - (settings.stages||[]).indexOf(b.v.stage);
+      case 'role':    return (a.v.role||'').localeCompare(b.v.role||'');
+      case 'name':    return `${a.v.last}${a.v.first}`.localeCompare(`${b.v.last}${b.v.first}`);
+      case 'date':    return new Date(a.v.date||0) - new Date(b.v.date||0);
+      default:        return 0;
     }
   });
 
-  if (rows.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">✅</div><h3>All caught up!</h3><p>No pending communications.</p></div></td></tr>`;
+  if (cards.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">✅</div>
+        <h3>All caught up!</h3>
+        <p>No pending communications.</p>
+      </div>`;
     return;
   }
 
-  const rowId = (v, comm) => `cr-${v.id}-${(comm.stage+comm.email).replace(/[^a-z0-9]/gi,'_')}`;
+  container.innerHTML = cards.map(({ v, pending }) => {
+    const ownerColor = v.owner === 'Lauren' ? 'var(--teal-mid)' : 'var(--gold)';
+    const ownerBg   = v.owner === 'Lauren' ? 'var(--teal-light)' : 'var(--gold-light)';
+    const isCollapsed = !!commsCollapsed[v.id];
+    const arrowStyle = isCollapsed ? 'transform:rotate(-90deg)' : 'transform:rotate(0deg)';
 
-  tbody.innerHTML = rows.map(({ v, comm }) => {
-    const rid = rowId(v, comm);
-    const safeSubject = (comm.subject || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    const emailItems = pending.filter(c => !c.track);
+    const asyncItems = pending.filter(c => c.track === 'async');
+
+    const renderCommRow = (comm) => {
+      const rid = `cr-${v.id}-${(comm.stage+comm.email).replace(/[^a-z0-9]/gi,'_')}`;
+      const safeEmail = comm.email.replace(/'/g,"\\'");
+      const safeStage = comm.stage.replace(/'/g,"\\'");
+      const isAsync = comm.track === 'async';
+      return `
+        <div style="padding:12px 0;border-bottom:1px solid #f0f2f5;">
+          <div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+            <div style="flex:1;min-width:0;">
+              <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:3px;">
+                <span style="font-size:12px;font-weight:600;color:#718096;">${comm.email}</span>
+                <span style="background:${comm.owner==='Lauren'?'var(--teal-light)':'var(--gold-light)'};
+                             color:${comm.owner==='Lauren'?'var(--teal-mid)':'var(--gold)'};
+                             border-radius:10px;padding:1px 8px;font-size:10px;font-weight:600;">${comm.owner}</span>
+                ${isAsync ? '<span style="background:#f0f4ff;color:#5a7bc2;border-radius:4px;padding:1px 7px;font-size:10px;font-weight:600;">ASYNC</span>' : ''}
+                ${!comm.body ? '<span style="background:#fdf3e3;color:#c8892a;border:1px solid #f0c977;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700;">NEEDS CONTENT</span>' : ''}
+              </div>
+              <div style="font-size:13px;font-style:italic;color:#4a5568;margin-bottom:4px;">${comm.subject||'—'}</div>
+              ${comm.placeholders && comm.placeholders.length ? `
+                <div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-bottom:4px;">
+                  <span style="font-size:10px;font-weight:700;color:#b45309;text-transform:uppercase;">Fill in:</span>
+                  ${comm.placeholders.map(p=>`<span style="font-size:11px;background:#fef3c7;color:#b45309;border:1px solid #fcd34d;border-radius:4px;padding:1px 6px;font-family:monospace">${p}</span>`).join('')}
+                </div>` : ''}
+              ${comm.preview ? `
+                <button class="comm-preview-toggle" onclick="toggleCommPreview('${rid}')">
+                  <span id="tog-${rid}">▶</span> Email preview
+                </button>
+                <div class="comm-preview-body" id="prev-${rid}">${comm.preview}</div>` : ''}
+            </div>
+            <div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;">
+              <button class="btn btn-primary" style="font-size:11px;padding:5px 10px;"
+                onclick="openComposeModal(${v.id},'${safeStage}','${safeEmail}')">
+                ✉️ Compose
+              </button>
+              <button class="btn" style="font-size:11px;padding:5px 10px;background:#f7f8fa;border:1px solid #e2e8f0;border-radius:6px;cursor:pointer;"
+                onclick="markCommDone(${v.id},'${safeStage}','${safeEmail}')">
+                ✓ Done
+              </button>
+            </div>
+          </div>
+        </div>`;
+    };
+
     return `
-    <tr>
-      <td>
-        <div class="volunteer-name">
-          <div class="avatar">${getInitials(v.first, v.last)}</div>
-          <div>
-            <div>${v.first} ${v.last}</div>
-            <div style="font-size:11px;color:var(--slate-light)">${v.email}</div>
+      <div class="table-card" style="margin-bottom:12px;padding:0;overflow:hidden;">
+
+        <!-- Volunteer header — clickable to collapse -->
+        <div onclick="toggleCommsCard(${v.id})"
+          style="padding:13px 20px;background:#f7f8fa;border-bottom:1px solid #e2e8f0;
+                 display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+                 cursor:pointer;user-select:none;"
+          onmouseover="this.style.background='#f0f2f5'" onmouseout="this.style.background='#f7f8fa'">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span id="comms-arrow-${v.id}"
+              style="font-size:11px;color:#718096;transition:transform 0.2s;display:inline-block;${arrowStyle};">▼</span>
+            <div class="avatar" style="width:34px;height:34px;font-size:12px;">${getInitials(v.first, v.last)}</div>
+            <div>
+              <div style="font-weight:600;font-size:15px;">${v.first} ${v.last}</div>
+              <div style="font-size:12px;color:#718096;">${v.email||''}</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+            <span class="badge ${getRoleBadgeClass(v.role)}">${v.role}</span>
+            <span class="badge ${getStageBadgeClass(v.stage)}">${v.stage}</span>
+            <span style="background:${ownerBg};color:${ownerColor};border-radius:10px;padding:2px 10px;font-size:11px;font-weight:600;">${v.owner}</span>
+            <span style="background:#e2e8f0;color:#4a5568;border-radius:10px;padding:2px 10px;font-size:11px;font-weight:600;">${pending.length} pending</span>
           </div>
         </div>
-      </td>
-      <td><span class="badge ${getRoleBadgeClass(v.role)}">${v.role}</span></td>
-      <td><span class="badge ${getStageBadgeClass(v.stage)}">${v.stage}</span></td>
-      <td>
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <span style="font-weight:600;font-size:13px">${comm.email}</span>
-          <span class="badge ${comm.owner === 'Lauren' ? 'badge-owner-lauren' : 'badge-owner-micaela'}" style="font-size:10px">${comm.owner}</span>
+
+        <!-- Collapsible body -->
+        <div id="comms-body-${v.id}" class="accordion-body${isCollapsed ? ' collapsed' : ''}" style="padding-top:0;">
+          <div style="padding:0 20px;">
+            ${emailItems.length > 0 ? `
+              <div style="padding-top:10px;padding-bottom:2px;">
+                <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#718096;margin-bottom:4px;">📧 Emails</div>
+                ${emailItems.map(renderCommRow).join('')}
+              </div>` : ''}
+            ${asyncItems.length > 0 ? `
+              <div style="padding-top:10px;padding-bottom:2px;">
+                <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#5a7bc2;margin-bottom:4px;">📱 Async Training Track</div>
+                ${asyncItems.map(renderCommRow).join('')}
+              </div>` : ''}
+          </div>
         </div>
-        <div style="display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap">
-          <span style="font-size:12px;color:var(--slate);font-style:italic;flex:1;min-width:0">${comm.subject || '—'}</span>
-          ${comm.subject ? `<button class="comm-copy-btn" id="cpybtn-${rid}" onclick="copySubject('${safeSubject}','cpybtn-${rid}')">📋 Copy subject</button>` : ''}
-        </div>
-        ${comm.placeholders && comm.placeholders.length ? `
-          <div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:4px;align-items:center">
-            <span style="font-size:10px;font-weight:700;color:#b45309;text-transform:uppercase;letter-spacing:0.04em">Fill in:</span>
-            ${comm.placeholders.map(p=>`<span style="font-size:11px;background:#fef3c7;color:#b45309;border:1px solid #fcd34d;border-radius:4px;padding:1px 6px;font-family:monospace">${p}</span>`).join('')}
-          </div>` : ''}
-        ${comm.preview ? `
-          <button class="comm-preview-toggle" onclick="toggleCommPreview('${rid}')">
-            <span id="tog-${rid}">▶</span> Email preview
-          </button>
-          <div class="comm-preview-body" id="prev-${rid}">
-            ${comm.preview}
-          </div>` : ''}
-      </td>
-      <td>
-        <button class="btn btn-primary" style="font-size:11px;padding:5px 10px" onclick="markCommDone(${v.id}, '${comm.stage}', '${comm.email.replace(/'/g,"\\'")}')">
-          ✓ Mark sent
-        </button>
-      </td>
-    </tr>
-  `}).join('');
+
+      </div>`;
+  }).join('');
 }
 
-async function markCommDone(id, stage, email) {
+function markCommDone(id, stage, email) {
   const v = volunteers.find(x => x.id === id);
   if (!v) return;
   const key = stage + '|' + email;
@@ -1834,11 +2382,6 @@ async function markCommDone(id, stage, email) {
   showToast(`Marked "${email}" as sent for ${v.first} ${v.last}`);
   renderComms();
   renderStats();
-  try {
-    await apiUpdateVolunteer(id, v);
-  } catch (err) {
-    console.error('Failed to save comm update:', err.message);
-  }
 }
 
 // ============================================================
@@ -1894,7 +2437,7 @@ function handleOverlayClick(e) {
   if (e.target === document.getElementById('modal-overlay')) closeModal();
 }
 
-async function saveVolunteer() {
+function saveVolunteer() {
   const first = document.getElementById('f-first').value.trim();
   const last = document.getElementById('f-last').value.trim();
   if (!first || !last) { alert('Please enter first and last name.'); return; }
@@ -1913,39 +2456,28 @@ async function saveVolunteer() {
     date: document.getElementById('f-date').value,
   };
 
-  try {
-    if (editingId) {
-      const v = volunteers.find(x => x.id === editingId);
-      const updated = await apiUpdateVolunteer(editingId, { ...v, ...data });
-      Object.assign(v, updated);
-      showToast(`${first} ${last} updated`);
-    } else {
-      const created = await apiAddVolunteer({ comms: {}, ...data });
-      volunteers.push(created);
-      showToast(`${first} ${last} added`);
-    }
-    closeModal();
-    renderRegistry();
-    renderStats();
-  } catch (err) {
-    alert('Error saving: ' + err.message);
+  if (editingId) {
+    const v = volunteers.find(x => x.id === editingId);
+    Object.assign(v, data);
+    showToast(`${first} ${last} updated`);
+  } else {
+    volunteers.push({ id: nextId++, comms: {}, ...data });
+    showToast(`${first} ${last} added`);
   }
+  closeModal();
+  renderRegistry();
+  renderStats();
 }
 
-async function deleteVolunteer() {
+function deleteVolunteer() {
   if (!editingId) return;
   const v = volunteers.find(x => x.id === editingId);
   if (!confirm(`Remove ${v.first} ${v.last} from the registry?`)) return;
-  try {
-    await apiDeleteVolunteer(editingId);
-    volunteers = volunteers.filter(x => x.id !== editingId);
-    showToast(`${v.first} ${v.last} removed`);
-    closeModal();
-    renderRegistry();
-    renderStats();
-  } catch (err) {
-    alert('Error deleting: ' + err.message);
-  }
+  volunteers = volunteers.filter(x => x.id !== editingId);
+  showToast(`${v.first} ${v.last} removed`);
+  closeModal();
+  renderRegistry();
+  renderStats();
 }
 
 // ============================================================
@@ -2019,25 +2551,15 @@ function updateCommsChecklist(existingVolunteer) {
   `).join('');
 }
 
-async function toggleCommInModal(key, checked, volId) {
+function toggleCommInModal(key, checked, volId) {
   if (volId === null) return;
   const v = volunteers.find(x => x.id === volId);
   if (!v) return;
-  if (checked) {
-    v.comms[key] = true;
-  } else {
-    delete v.comms[key];
-  }
+  if (checked) { v.comms[key] = true; } else { delete v.comms[key]; }
   const itemId = 'ci-' + key.replace(/[^a-z0-9]/gi,'_');
   const el = document.getElementById(itemId);
   if (el) el.classList.toggle('done', checked);
   renderStats();
-  // Persist the updated comms to the server
-  try {
-    await apiUpdateVolunteer(volId, v);
-  } catch (err) {
-    console.error('Failed to save comms update:', err.message);
-  }
 }
 
 // ============================================================
@@ -2084,6 +2606,40 @@ function copySubject(subject, btnId) {
 // INIT
 // ============================================================
 
+// ── SETTINGS MANAGEMENT ───────────────────────────────────────────────────────
+
+function renderSettingsLists() {
+  ['roles', 'stages', 'owners', 'timezones'].forEach(key => {
+    const container = document.getElementById('settings-' + key);
+    if (!container) return;
+    container.innerHTML = settings[key].map((item, i) => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);">
+        <span style="font-size:13px;">${item}</span>
+        <button onclick="removeSettingItem('${key}', ${i})" style="background:none;border:none;color:var(--slate-light);cursor:pointer;font-size:16px;line-height:1;padding:0 4px;" title="Remove">×</button>
+      </div>
+    `).join('');
+  });
+}
+
+async function addSettingItem(key, inputId) {
+  const input = document.getElementById(inputId);
+  const val = input.value.trim();
+  if (!val) return;
+  if (settings[key].includes(val)) { showToast('Already exists'); return; }
+  settings[key] = [...settings[key], val];
+  input.value = '';
+  buildDropdowns();
+  showToast(`Added "${val}"`);
+}
+
+async function removeSettingItem(key, index) {
+  const val = settings[key][index];
+  if (!confirm(`Remove "${val}" from ${key}?`)) return;
+  settings[key] = settings[key].filter((_, i) => i !== index);
+  buildDropdowns();
+  showToast(`Removed "${val}"`);
+}
+
 // ── CSV EXPORT ────────────────────────────────────────────────────────────────
 
 function exportCSV() {
@@ -2116,17 +2672,342 @@ function exportCSV() {
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 
-async function init() {
-  try {
-    await apiLoadVolunteers();
-  } catch (err) {
-    console.error('Could not load volunteers:', err.message);
-  }
+function init() {
+  buildDropdowns();
   renderRegistry();
   renderStats();
 }
 
+function buildDropdowns() {
+  // Helper to populate a <select> element
+  function populate(id, items, allLabel) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const current = el.value;
+    el.innerHTML = allLabel ? `<option value="">${allLabel}</option>` : `<option value="">Select...</option>`;
+    items.forEach(item => {
+      const opt = document.createElement('option');
+      opt.value = item; opt.textContent = item;
+      if (item === current) opt.selected = true;
+      el.appendChild(opt);
+    });
+  }
+  populate('filter-role', settings.roles, 'All Roles');
+  populate('filter-stage', settings.stages, 'All Stages');
+  populate('filter-owner', settings.owners, 'All Owners');
+  populate('pipeline-filter-role', settings.roles, 'All Roles');
+  populate('f-role', settings.roles, null);
+  populate('f-stage', settings.stages, null);
+  populate('f-owner', settings.owners, null);
+  populate('f-timezone', settings.timezones, null);
+  renderSettingsLists();
+}
+
+// ============================================================
+// COMPOSE MODAL
+// ============================================================
+
+let composeVolunteerId = null;
+let composeCommKey = null;
+
+function openComposeModal(volId, stage, emailLabel) {
+  const v = volunteers.find(x => x.id === volId);
+  if (!v) return;
+  const workflow = COMMS_WORKFLOW[v.role] || [];
+  const comm = workflow.find(c => c.stage === stage && c.email === emailLabel);
+  if (!comm) {
+    showToast('Could not find email template — check console');
+    console.warn('openComposeModal: no match for', { stage, emailLabel, workflow: workflow.map(c => c.email) });
+    return;
+  }
+
+  composeVolunteerId = volId;
+  composeCommKey = stage + '|' + emailLabel;
+
+  // Set To field
+  document.getElementById('compose-to').textContent = `${v.first} ${v.last} <${v.email || 'no email on file'}>`;
+
+  // Set subject — replace volunteer name if present
+  let subject = comm.subject.replace(/\{Name\}/gi, v.first || '{Name}');
+  document.getElementById('compose-subject').textContent = subject;
+  document.getElementById('compose-title').textContent = `${comm.email} — ${v.first} ${v.last}`;
+
+  // Build placeholder fields if any
+  const placeholderSection = document.getElementById('compose-placeholders-section');
+  const placeholderFields = document.getElementById('compose-placeholder-fields');
+
+  if (comm.placeholders && comm.placeholders.length > 0) {
+    placeholderSection.style.display = 'block';
+    placeholderFields.innerHTML = comm.placeholders.map(p => `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <label style="font-size:12px;color:#718096;min-width:180px;font-weight:500;">${p}</label>
+        <input type="text" data-placeholder="${p}"
+          style="flex:1;padding:7px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;"
+          placeholder="Fill in..."
+          oninput="updateComposeBody()">
+      </div>
+    `).join('');
+  } else {
+    placeholderSection.style.display = 'none';
+    placeholderFields.innerHTML = '';
+  }
+
+  // Set body
+  let body = comm.body || `(Email body not yet added for this template.\n\nSubject: ${comm.subject}\n\nPlease compose this email manually in your email client.)`;
+  // Auto-fill volunteer name
+  body = body.replace(/\{Name\}/gi, v.first || '{Name}');
+  document.getElementById('compose-body').value = body;
+  document.getElementById('compose-body').dataset.template = body;
+
+  document.getElementById('compose-overlay').classList.add('open');
+}
+
+function updateComposeBody() {
+  const textarea = document.getElementById('compose-body');
+  let body = textarea.dataset.template || textarea.value;
+  // Apply each filled placeholder
+  document.querySelectorAll('#compose-placeholder-fields input').forEach(input => {
+    const key = input.dataset.placeholder;
+    const val = input.value.trim();
+    if (val) {
+      body = body.split(key).join(val);
+    }
+  });
+  textarea.value = body;
+}
+
+function copyComposedEmail() {
+  const subject = document.getElementById('compose-subject').textContent;
+  const body = document.getElementById('compose-body').value;
+  const full = `Subject: ${subject}\n\n${body}`;
+  navigator.clipboard.writeText(full).then(() => {
+    const btn = document.getElementById('compose-copy-btn');
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => { btn.textContent = '📋 Copy to Clipboard'; }, 2000);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = full;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    const btn = document.getElementById('compose-copy-btn');
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => { btn.textContent = '📋 Copy to Clipboard'; }, 2000);
+  });
+}
+
+function markSentFromCompose() {
+  if (!composeVolunteerId || !composeCommKey) return;
+  const v = volunteers.find(x => x.id === composeVolunteerId);
+  if (!v) return;
+  v.comms[composeCommKey] = true;
+  showToast(`Marked as sent for ${v.first} ${v.last}`);
+  closeComposeModal();
+  renderComms();
+  renderStats();
+}
+
+function closeComposeModal() {
+  document.getElementById('compose-overlay').classList.remove('open');
+  composeVolunteerId = null;
+  composeCommKey = null;
+}
+
+function handleComposeOverlayClick(e) {
+  if (e.target === document.getElementById('compose-overlay')) closeComposeModal();
+}
+
+// ============================================================
+// ACCORDION
+// ============================================================
+function toggleAccordion(name) {
+  const body = document.getElementById('acc-body-' + name);
+  const arrow = document.getElementById('acc-arrow-' + name);
+  const isCollapsed = body.classList.contains('collapsed');
+  body.classList.toggle('collapsed', !isCollapsed);
+  arrow.classList.toggle('collapsed', !isCollapsed);
+}
+
+// ============================================================
+// TEMPLATES TAB
+// ============================================================
+
+let activeTemplateRole = null;
+let editingTemplateRef = null; // { role, index }
+
+function renderTemplates() {
+  const roles = Object.keys(COMMS_WORKFLOW);
+  if (!activeTemplateRole || !roles.includes(activeTemplateRole)) {
+    activeTemplateRole = roles[0];
+  }
+
+  // Role tabs
+  const tabsEl = document.getElementById('template-role-tabs');
+  tabsEl.innerHTML = roles.map(role => {
+    const all = COMMS_WORKFLOW[role];
+    const needsContent = all.filter(e => !e.body).length;
+    const isActive = role === activeTemplateRole;
+    return `<button onclick="setTemplateRole('${role}')"
+      style="padding:8px 16px;border-radius:20px;border:1px solid ${isActive ? '#2d9d8f' : '#e2e8f0'};
+             background:${isActive ? '#2d9d8f' : 'white'};color:${isActive ? 'white' : '#4a5568'};
+             font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;
+             display:flex;align-items:center;gap:6px;">
+      ${role}
+      ${needsContent > 0 ? `<span style="background:${isActive ? 'rgba(255,255,255,0.3)' : '#fdf3e3'};color:${isActive ? 'white' : '#c8892a'};border-radius:10px;padding:1px 7px;font-size:11px;">${needsContent} to do</span>` : ''}
+    </button>`;
+  }).join('');
+
+  // Template list
+  const listEl = document.getElementById('template-list');
+  const templates = COMMS_WORKFLOW[activeTemplateRole] || [];
+
+  // Group by stage
+  const byStage = {};
+  templates.forEach((t, i) => {
+    if (!byStage[t.stage]) byStage[t.stage] = [];
+    byStage[t.stage].push({ ...t, _index: i });
+  });
+
+  listEl.innerHTML = Object.entries(byStage).map(([stage, items]) => `
+    <div style="margin-bottom:24px;">
+      <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:#718096;margin-bottom:10px;padding-left:2px;">
+        Stage: ${stage}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        ${items.map(t => {
+          const hasBody = !!t.body;
+          const ownerColor = t.owner === 'Lauren' ? '#2d9d8f' : t.owner === 'Micaela' ? '#c8892a' : '#718096';
+          const ownerBg = t.owner === 'Lauren' ? '#e8f5f3' : t.owner === 'Micaela' ? '#fdf3e3' : '#f7f8fa';
+          return `
+          <div onclick="openTemplateEditor('${activeTemplateRole}', ${t._index})"
+            style="background:white;border:1px solid ${hasBody ? '#e2e8f0' : '#f0c977'};border-radius:10px;
+                   padding:16px 20px;cursor:pointer;transition:box-shadow 0.15s;
+                   display:flex;align-items:center;gap:16px;"
+            onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'"
+            onmouseout="this.style.boxShadow='none'">
+            <div style="flex:1;min-width:0;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">
+                <span style="font-size:12px;font-weight:600;color:#718096;">${t.email}</span>
+                <span style="background:${ownerBg};color:${ownerColor};border-radius:10px;padding:2px 8px;font-size:11px;font-weight:600;">${t.owner}</span>
+                ${!hasBody ? '<span style="background:#fdf3e3;color:#c8892a;border:1px solid #f0c977;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700;">NEEDS CONTENT</span>' : ''}
+                ${t.placeholders && t.placeholders.length > 0 ? `<span style="background:#f0f4ff;color:#5a7bc2;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600;">${t.placeholders.length} placeholder${t.placeholders.length > 1 ? 's' : ''}</span>` : ''}
+              </div>
+              <div style="font-size:14px;font-weight:500;color:#2c3e50;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.subject}</div>
+              ${t.notes ? `<div style="font-size:12px;color:#718096;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.notes}</div>` : ''}
+            </div>
+            <div style="color:#c8d3df;font-size:18px;flex-shrink:0;">›</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function setTemplateRole(role) {
+  activeTemplateRole = role;
+  renderTemplates();
+}
+
+function openTemplateEditor(role, index) {
+  const t = COMMS_WORKFLOW[role][index];
+  editingTemplateRef = { role, index };
+
+  document.getElementById('tpl-editor-label').textContent = `${role} · ${t.stage} · ${t.email}`;
+  document.getElementById('tpl-editor-title').textContent = t.subject;
+  document.getElementById('tpl-subject-input').value = t.subject;
+  document.getElementById('tpl-body-input').value = t.body || '';
+
+  const needsBadge = document.getElementById('tpl-needs-content-badge');
+  needsBadge.style.display = t.body ? 'none' : 'inline';
+
+  document.getElementById('tpl-notes-input').value = t.notes || '';
+
+  const placeholderSection = document.getElementById('tpl-placeholders-display');
+  const placeholderChips = document.getElementById('tpl-placeholder-chips');
+  if (t.placeholders && t.placeholders.length > 0) {
+    placeholderSection.style.display = 'block';
+    placeholderChips.innerHTML = t.placeholders.map(p =>
+      `<span style="background:#f0f4ff;color:#5a7bc2;border:1px solid #c8d5f0;border-radius:4px;padding:3px 9px;font-size:12px;font-family:monospace;">${p}</span>`
+    ).join('');
+  } else {
+    placeholderSection.style.display = 'none';
+  }
+
+  document.getElementById('template-editor-overlay').style.display = 'block';
+}
+
+function saveTemplateEdits() {
+  if (!editingTemplateRef) return;
+  const { role, index } = editingTemplateRef;
+  const t = COMMS_WORKFLOW[role][index];
+
+  t.subject = document.getElementById('tpl-subject-input').value.trim();
+  t.body = document.getElementById('tpl-body-input').value;
+  t.notes = document.getElementById('tpl-notes-input').value.trim();
+
+  // Auto-detect placeholders from body
+  const matches = [...(t.body.matchAll(/\{[^}]+\}/g))].map(m => m[0]);
+  t.placeholders = [...new Set(matches)];
+
+  showToast('Template saved ✓');
+  closeTemplateEditor();
+  renderTemplates();
+}
+
+function closeTemplateEditor() {
+  document.getElementById('template-editor-overlay').style.display = 'none';
+  editingTemplateRef = null;
+}
+
+function handleTemplateOverlayClick(e) {
+  if (e.target === document.getElementById('template-editor-overlay')) closeTemplateEditor();
+}
+
 init();
 </script>
+<!-- COMPOSE MODAL -->
+<div class="modal-overlay" id="compose-overlay" onclick="handleComposeOverlayClick(event)">
+  <div class="modal" id="compose-modal" style="max-width:680px;">
+    <div class="modal-header">
+      <div class="modal-title" id="compose-title">Compose Email</div>
+      <button class="modal-close" onclick="closeComposeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom:16px;">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#718096;margin-bottom:6px;">To</div>
+        <div id="compose-to" style="font-size:14px;color:#2c3e50;padding:8px 12px;background:#f7f8fa;border-radius:6px;border:1px solid #e2e8f0;"></div>
+      </div>
+      <div style="margin-bottom:16px;">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#718096;margin-bottom:6px;">Subject</div>
+        <div id="compose-subject" style="font-size:14px;color:#2c3e50;padding:8px 12px;background:#f7f8fa;border-radius:6px;border:1px solid #e2e8f0;font-weight:500;"></div>
+      </div>
+      <div id="compose-placeholders-section" style="margin-bottom:16px;display:none;">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#c8892a;margin-bottom:8px;">⚠️ Fill in before sending</div>
+        <div id="compose-placeholder-fields" style="display:grid;gap:8px;"></div>
+      </div>
+      <div style="margin-bottom:12px;">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#718096;margin-bottom:6px;">Body</div>
+        <textarea id="compose-body"
+          style="width:100%;min-height:320px;padding:12px;border:1px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:'DM Sans',sans-serif;line-height:1.6;resize:vertical;outline:none;color:#2c3e50;"></textarea>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">
+        <button onclick="copyComposedEmail()" id="compose-copy-btn"
+          style="background:#2d9d8f;color:white;border:none;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">
+          📋 Copy to Clipboard
+        </button>
+        <button onclick="markSentFromCompose()" 
+          style="background:#2c3e50;color:white;border:none;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">
+          ✓ Mark as Sent
+        </button>
+        <button onclick="closeComposeModal()"
+          style="background:none;border:1px solid #e2e8f0;border-radius:8px;padding:10px 20px;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;color:#718096;">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
